@@ -19,7 +19,6 @@ def part_1(data):
     """ get the range of targets (min → max) of crabs position
         calculate for each target the lowest cost (crab's pos - target)  """    
     positions = sorted(data)
-    # targets   = list(set(data))
     targets   = range(positions[0], positions[-1])
     distances = [(target,sum([abs(position - target) for position in positions])) for target in targets]
     best_pos  = min(distances, key= lambda x: x[1])
@@ -36,7 +35,6 @@ def part_2(data):
     """ get the range of targets (min → max) of crabs position
         calculate for each target the lowest cost (crab's pos - target)  """    
     positions = sorted(data)
-    # targets   = list(set(data))
     targets   = range(positions[0], positions[-1])
     distances = [(target,sum([moves_cost(abs(position - target)) for position in positions])) for target in targets]
     best_pos  = min(distances, key= lambda x: x[1])
