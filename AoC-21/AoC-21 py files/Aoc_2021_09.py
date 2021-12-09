@@ -16,6 +16,7 @@ def load_data(datafile):
         return None
 
 def print_map(data, erase= '*'):
+    """ display the lower points map or the basins map """
     maxx, maxy = max([lwrpts[1] for lwrpts in data]), max([lwrpts[0] for lwrpts in data])
     print('part1: Lower points\n' if erase =='*' else 'part2: basins\n')
     for j in range(maxy):
@@ -28,6 +29,7 @@ def print_map(data, erase= '*'):
     print('\n')
 
 def get_point(data, j, i):
+    """ get info from the (i,j) point """
     maxx, maxy = max([lwrpts[1] for lwrpts in data]), max([lwrpts[0] for lwrpts in data])
     if i in (0, maxx+1) or j in (0,maxy+1): 
         return (i, j , False, 'A')
@@ -35,18 +37,20 @@ def get_point(data, j, i):
         return data[(i-1)+(j-1)*maxx]
 
 def set_point_flag(data, j, i, value):
+    """ set the flag (3rd position, True/False) of the (i,j) point """
     maxx = max([lwrpts[1] for lwrpts in data])
     index = (i-1)+(j-1)*maxx
     data[index] = (data[index][0], data[index][1], value, data[index][3])
 
 def is_lower(df, x, y):
+    """ check if adjacents points (← → ↑ ↓) are lower than given point """
     for near in (df.iloc[x-1,y], df.iloc[x+1,y], df.iloc[x,y-1], df.iloc[x,y+1]):
         if near <= df.iloc[x,y]: return False, int(df.iloc[x,y])
     return True, int(df.iloc[x,y])
 
-@timer3
+#@timer3
 def part_1(data):
-    """ for each point inside the border search lower point """   
+    """ for each point inside the border search lower points """   
     points   = []
     for i in range(1, data.shape[0]-1):
         for j in range(1, data.shape[1]-1):   
@@ -54,36 +58,35 @@ def part_1(data):
     return sum([lwrpts[3] + 1 for lwrpts in points if lwrpts[2]]), points
     
 def check_near(mappoints, x, y):
-     if get_point(mappoints, x-1, y)[3] not in ['A', 9] and not get_point(mappoints, x-1, y)[2]: 
-         # print(' ↑', get_point(mappoints, x-1, y))
+    """ check if adjacents points (← → ↑ ↓) are borders (value = 'A') or 
+        higher points (value = 9) or already explored (flag = True)
+        if not each one is explored. all points flagged True belong to the same 
+        basin starting from the initial lower point """
+    if get_point(mappoints, x-1, y)[3] not in ['A', 9] and not get_point(mappoints, x-1, y)[2]: 
          set_point_flag(mappoints, x-1, y, True)
          check_near(mappoints, x-1, y)
-
-     if get_point(mappoints, x+1, y)[3] not in ['A', 9] and not get_point(mappoints, x+1, y)[2]: 
-         # print(' ↓', get_point(mappoints, x+1, y))
+         
+    if get_point(mappoints, x+1, y)[3] not in ['A', 9] and not get_point(mappoints, x+1, y)[2]: 
          set_point_flag(mappoints, x+1, y, True)
          check_near(mappoints, x+1, y)
 
-     if get_point(mappoints, x, y-1)[3] not in ['A', 9] and not get_point(mappoints, x, y-1)[2]: 
-         # print(' ←', get_point(mappoints, x, y-1))
+    if get_point(mappoints, x, y-1)[3] not in ['A', 9] and not get_point(mappoints, x, y-1)[2]: 
          set_point_flag(mappoints, x, y-1, True)
          check_near(mappoints,  x, y-1)
 
-     if get_point(mappoints, x, y+1)[3] not in ['A', 9] and not get_point(mappoints, x, y+1)[2]: 
-         # print(' →', get_point(mappoints, x, y+1))
+    if get_point(mappoints, x, y+1)[3] not in ['A', 9] and not get_point(mappoints, x, y+1)[2]: 
          set_point_flag(mappoints, x, y+1, True)
          check_near(mappoints, x, y+1)
   
-@timer3
+#@timer3
 def part_2(mappoints):
     """ for each lowerpoints qualify the adjacent points """   
     basins_size = []
     for point in [lwrpts for lwrpts in mappoints if lwrpts[2]]:
-        # set all points flag to False
+        # set all points flag to False before walking
         basinpoints = [(pts[0], pts[1], False, pts[3]) for pts in mappoints]
         check_near(basinpoints, point[0], point[1])
         basinpoints = [(pts[0], pts[1]) for pts in basinpoints if pts[2]]
-        #print(basinpoints)
         basins_size.append(len(basinpoints))
     return reduce(lambda x,y:x*y,sorted(basins_size)[-3:])
     
@@ -91,7 +94,7 @@ def part_2(mappoints):
 if __name__ == '__main__':
     year, day = 2021, 9
     puzzle    = Puzzle(year, day)
-    source = 'txt'
+    source = 'tst'
     
     pz_data = load_data(f'AoC-{str(year)[2:]} {source} files/Aoc_{year}_{day:02d}.{source}')   
     if pz_data == None: sys.exit()
