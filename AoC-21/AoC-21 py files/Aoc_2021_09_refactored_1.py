@@ -116,4 +116,3 @@ if __name__ == '__main__':
           
     print(f'{chr(10)+"—"*50+chr(10)}my solutions for "{puzzle.title}" on {source} are: "'\
           f'{chr(10)}   part1: {result_1}{chr(10)}   part2: {result_2}')    
-    
