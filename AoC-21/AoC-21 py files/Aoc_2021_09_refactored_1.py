@@ -1,7 +1,6 @@
 from   aocd.models import Puzzle
 from   pprint import pprint
 from   functools import cache, reduce
-import pandas
 
 import sys
 sys.path.append('../../PSA/SCALIAN__GENERIC/1_COMMON_TOOLS')
